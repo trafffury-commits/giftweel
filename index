@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Крути колесо удачи</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f001a, #1a0033, #2a004d);
+      color: #f0e6ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      margin: 0.4em 0 0.8em;
+      background: linear-gradient(90deg, #ff6bcb, #a78bfa, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(167,139,250,0.6);
+    }
+
+    #wheel-container {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      margin: 1.5rem 0;
+    }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(
+        #ff3366 0deg 60deg,
+        #ff6bcb 60deg 120deg,
+        #cc33ff 120deg 180deg,
+        #9933ff 180deg 240deg,
+        #6633ff 240deg 300deg,
+        #3366ff 300deg 360deg
+      );
+      box-shadow: 0 0 40px rgba(200,100,255,0.7), inset 0 0 30px rgba(0,0,0,0.6);
+      transition: transform 4.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+      transform: rotate(0deg);
+    }
+
+    .pointer {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-bottom: 36px solid #ffeb3b;
+      filter: drop-shadow(0 0 10px #ffeb3b);
+      z-index: 10;
+    }
+
+    .segment {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 50%, 100% 0, 100% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 1px 4px black;
+      transform-origin: 50% 50%;
+    }
+
+    #spin-btn {
+      margin-top: 1.5rem;
+      padding: 1rem 2.8rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(45deg, #ff3366, #cc33ff);
+      border: none;
+      border-radius: 50px;
+      box-shadow: 0 8px 25px rgba(204,51,255,0.5);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    #spin-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(204,51,255,0.7);
+    }
+
+    #spin-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    #result {
+      margin-top: 1.5rem;
+      font-size: 2.1rem;
+      font-weight: bold;
+      min-height: 2.8rem;
+      text-shadow: 0 0 15px rgba(255,255,255,0.6);
+    }
+
+    #congrats {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    #congrats h2 {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, #00ff9d, #00eaff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #claim-btn {
+      margin-top: 2rem;
+      padding: 1.2rem 3.5rem;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(45deg, #00c853, #64dd17);
+      border: none;
+      border-radius: 60px;
+      box-shadow: 0 10px 30px rgba(100,221,23,0.5);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    #claim-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 15px 40px rgba(100,221,23,0.7);
+    }
+
+    footer {
+      position: absolute;
+      bottom: 1rem;
+      opacity: 0.6;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Крути колесо удачи!</h1>
+
+  <div id="wheel-container">
+    <div class="pointer"></div>
+    <div id="wheel"></div>
+  </div>
+
+  <button id="spin-btn">Крутить →</button>
+
+  <div id="result"></div>
+
+  <div id="congrats">
+    <h2>Поздравляем!</h2>
+    <p style="font-size:1.6rem; max-width:600px; opacity:0.95;">
+      Ты выиграл <span id="final-prize" style="font-weight:bold; color:#00ff9d;">100 000 рупий</span>!
+    </p>
+    <button id="claim-btn">Забрать приз сейчас!</button>
+  </div>
+
+  <footer>2026 © Traff</footer>
+
+  <script>
+    const prizes = [
+      "0 рупий",
+      "1.000 рупий",
+      "10.000 рупий",
+      "100.000 рупий",
+      "iPhone 17 PRO MAX",
+      "Подписка Netflix"
+    ];
+
+    // Фиксированная последовательность выигрышей (индексы)
+    const sequence = [0, 2, 3]; // 0 рупий → 10.000 → 100.000
+    let spinCount = 0;
+    let isSpinning = false;
+
+    const wheel = document.getElementById("wheel");
+    const spinBtn = document.getElementById("spin-btn");
+    const resultEl = document.getElementById("result");
+    const congrats = document.getElementById("congrats");
+    const claimBtn = document.getElementById("claim-btn");
+    const finalPrizeEl = document.getElementById("final-prize");
+
+    // Создаём сегменты
+    function createWheel() {
+      wheel.innerHTML = "";
+      const degPerSegment = 360 / prizes.length;
+
+      prizes.forEach((prize, i) => {
+        const segment = document.createElement("div");
+        segment.className = "segment";
+        segment.style.transform = `rotate(${i * degPerSegment}deg)`;
+        segment.style.background = `hsl(${i * (360/prizes.length)}, 80%, 55%)`;
+        
+        const text = document.createElement("div");
+        text.style.transform = `rotate(${90 + degPerSegment/2}deg) translate(120px) rotate(-${90 + degPerSegment/2}deg)`;
+        text.textContent = prize;
+        segment.appendChild(text);
+        
+        wheel.appendChild(segment);
+      });
+    }
+
+    createWheel();
+
+    function getRandomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    spinBtn.addEventListener("click", () => {
+      if (isSpinning || spinCount >= 3) return;
+      isSpinning = true;
+      spinBtn.disabled = true;
+
+      // Фиксированный приз по счётчику
+      const winIndex = sequence[spinCount];
+      const baseDeg = 360 * 5; // 5 полных оборотов
+      const segmentDeg = 360 / prizes.length;
+      // Центрируем приз под стрелку + небольшой рандом внутри сектора
+      const offset = getRandomInRange(-segmentDeg * 0.4, segmentDeg * 0.4);
+      const finalRotation = baseDeg + (360 - (winIndex * segmentDeg + segmentDeg/2 + offset));
+
+      wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+      setTimeout(() => {
+        const prizeText = prizes[winIndex];
+        resultEl.textContent = `Вы выиграли: ${prizeText}! 🎉`;
+
+        spinCount++;
+        
+        if (spinCount >= 3) {
+          // Показываем поздравление
+          setTimeout(() => {
+            finalPrizeEl.textContent = "100.000 рупий";
+            congrats.style.display = "flex";
+          }, 1800);
+        } else {
+          spinBtn.disabled = false;
+        }
+
+        isSpinning = false;
+      }, 5200);
+    });
+
+    claimBtn.addEventListener("click", () => {
+      // Куда отправить пользователя после нажатия "Забрать"
+      // Варианты:
+      // window.location.href = "https://t.me/твой_ник";
+      // window.location.href = "https://ваш-лендинг.com/claim";
+      // или просто форма / фейковая страница
+      window.location.href = "https://t.me/+твой_канал_или_бот"; // ← поменяй на свой
+    });
+  </script>
+
+</body>
+</html>

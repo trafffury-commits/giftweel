@@ -83,6 +83,32 @@
       padding: 28px 24px 24px; position: relative; overflow: hidden;
     }
 
+    .offer-entry-overlay {
+      position: fixed; inset: 0; z-index: 120; display: none;
+      align-items: center; justify-content: center; padding: 18px;
+      background: rgba(7, 17, 31, 0.56); backdrop-filter: blur(12px);
+    }
+
+    .offer-entry-modal {
+      width: min(680px, 100%); border-radius: 34px; overflow: hidden;
+      background: linear-gradient(135deg, #ffffff, #f8fbff);
+      border: 1px solid rgba(255,255,255,0.92);
+      box-shadow: 0 30px 90px rgba(15,23,42,0.24);
+    }
+
+    .offer-entry-top { padding: 32px 28px 18px; background: radial-gradient(circle at top left, rgba(29,78,216,0.12), transparent 30%), radial-gradient(circle at top right, rgba(220,38,38,0.10), transparent 26%), linear-gradient(180deg, #ffffff, #f9fbff); }
+    .offer-entry-badge { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; font-size: 13px; font-weight: 900; color: var(--blue); background: rgba(29,78,216,0.10); margin-bottom: 14px; }
+    .offer-entry-top h2 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 48px); line-height: 0.98; letter-spacing: -1.2px; color: var(--text); }
+    .offer-entry-top p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.65; }
+
+    .offer-entry-body { padding: 18px 28px 28px; display: grid; gap: 14px; }
+    .offer-entry-card { padding: 18px 20px; border-radius: 22px; background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(241,245,249,0.96)); border: 1px solid rgba(15,23,42,0.07); }
+    .offer-entry-card small { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .offer-entry-card strong { font-size: 22px; line-height: 1.25; color: var(--text); }
+
+    .offer-entry-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 4px; }
+    .offer-entry-note { color: var(--muted); font-size: 13px; line-height: 1.55; font-weight: 600; }
+
     .wheel-topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
     .wheel-topbar h2 { margin: 0; font-size: 22px; }
     .wheel-topbar p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
@@ -236,15 +262,73 @@
       display: none; border: 1px solid rgba(15,23,42,0.08); background: white;
     }
 
-    /* ────────────────────────────── */
-    /*         Форма + кнопки         */
-    /* ────────────────────────────── */
+    .offer-overlay {
+      position: fixed; inset: 0; z-index: 100; display: none;
+      align-items: center; justify-content: center; padding: 18px;
+      background: rgba(7, 17, 31, 0.66); backdrop-filter: blur(14px);
+    }
+
+    .offer-modal {
+      width: min(960px, 100%); border-radius: 34px; overflow: hidden;
+      background: linear-gradient(135deg, #ffffff, #f8fbff);
+      box-shadow: 0 30px 90px rgba(15,23,42,0.28);
+      border: 1px solid rgba(255,255,255,0.92);
+    }
+
+    .offer-top { padding: 34px 34px 18px; background: radial-gradient(circle at top left, rgba(29,78,216,0.12), transparent 30%), radial-gradient(circle at top right, rgba(220,38,38,0.10), transparent 26%), linear-gradient(180deg, #ffffff, #f9fbff); }
+    .offer-kicker { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; font-size: 13px; font-weight: 900; color: var(--blue); background: rgba(29,78,216,0.10); margin-bottom: 14px; }
+    .offer-top h2 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 52px); line-height: 0.98; letter-spacing: -1.3px; color: var(--text); }
+    .offer-top p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.65; max-width: 700px; }
+
+    .offer-body { padding: 18px 34px 34px; display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 22px; align-items: stretch; }
+
+    .offer-product, .offer-details {
+      border-radius: 28px; background: rgba(255,255,255,0.88);
+      border: 1px solid rgba(15,23,42,0.08); box-shadow: 0 14px 36px rgba(15,23,42,0.08);
+    }
+
+    .offer-product {
+      padding: 28px; display: flex; flex-direction: column; justify-content: center;
+      align-items: center; text-align: center; min-height: 420px;
+      background: linear-gradient(180deg, #ffffff, #f6f9fe);
+    }
+
+    .offer-product img {
+      width: min(320px, 100%); max-height: 260px; object-fit: contain;
+      border-radius: 26px; margin-bottom: 18px; background: white;
+    }
+
+    .offer-product .emoji { font-size: 84px; margin-bottom: 16px; display: none; }
+    .offer-product h3 { margin: 0 0 8px; font-size: 28px; line-height: 1.08; color: var(--text); }
+    .offer-product span { color: var(--muted); font-size: 15px; line-height: 1.55; }
+
+    .offer-details { padding: 24px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+
+    .offer-grid { display: grid; gap: 12px; }
+
+    .offer-item {
+      padding: 16px 18px; border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(241,245,249,0.96));
+      border: 1px solid rgba(15,23,42,0.07);
+    }
+
+    .offer-item small { display: block; margin-bottom: 5px; font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .offer-item strong { font-size: 18px; line-height: 1.4; color: var(--text); }
+
+    .offer-note {
+      padding: 16px 18px; border-radius: 20px; color: #92400e;
+      background: rgba(245,158,11,0.10); border: 1px solid rgba(245,158,11,0.16);
+      font-size: 14px; line-height: 1.6; font-weight: 700;
+    }
+
+    .offer-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+    .offer-close { min-width: 160px; }
 
     .summary {
       display: none; margin-top: 32px; padding: 32px 24px; border-radius: 32px;
       background: linear-gradient(135deg, rgba(29,78,216,0.10), rgba(236,72,153,0.08));
-      border: 1px solid rgba(29,78,216,0.15);
-      text-align: center;
+      border: 1px solid rgba(29,78,216,0.15); text-align: center;
     }
 
     .summary h3 { font-size: 32px; margin: 0 0 16px; }
@@ -261,11 +345,7 @@
     .form-group { flex: 1; min-width: 240px; }
     .form-group.half { flex: 0.48; }
 
-    label {
-      display: block; margin-bottom: 8px; font-size: 14px;
-      font-weight: 700; color: var(--text);
-    }
-
+    label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: var(--text); }
     .required { color: var(--red); font-weight: bold; }
 
     input, select {
@@ -289,30 +369,15 @@
       cursor: pointer;
     }
 
-    .btn-unlock {
-      background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
-    }
-    .btn-unlock:hover {
-      transform: translateY(-4px) scale(1.04);
-      box-shadow: 0 28px 80px rgba(29,78,216,0.45);
-    }
+    .btn-unlock { background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink)); }
+    .btn-unlock:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 28px 80px rgba(29,78,216,0.45); }
 
-    .btn-reward {
-      background: linear-gradient(135deg, var(--gold), #f97316, var(--red));
-    }
-    .btn-reward:hover {
-      transform: translateY(-4px) scale(1.04);
-      box-shadow: 0 28px 80px rgba(245,158,11,0.5);
-    }
+    .btn-reward { background: linear-gradient(135deg, var(--gold), #f97316, var(--red)); }
+    .btn-reward:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 28px 80px rgba(245,158,11,0.5); }
 
-    .timer {
-      margin-top: 24px; font-size: 15px; font-weight: 700;
-      color: #92400e; opacity: 0.9;
-    }
+    .timer { margin-top: 24px; font-size: 15px; font-weight: 700; color: #92400e; opacity: 0.9; }
 
-    .footer-note {
-      text-align: center; color: var(--muted); font-size: 13px; padding: 32px 0 48px;
-    }
+    .footer-note { text-align: center; color: var(--muted); font-size: 13px; padding: 32px 0 48px; }
 
     @media (max-width: 640px) {
       .container { padding: 14px; }
@@ -588,7 +653,6 @@
         const data = getCardData(stage, item);
         const card = document.createElement('div');
         card.className = `reel-card ${data.product ? 'product' : ''}`;
-        card.dataset.value = data.title;
         card.innerHTML = `
           <div class="reel-icon">${data.icon}</div>
           <img class="reel-img" src="${data.img || ''}" alt="${data.title}">
@@ -623,13 +687,11 @@
         document.getElementById('dot1').classList.add('active');
         document.getElementById('circle1').textContent = value;
         document.getElementById('text1').textContent = value;
-        document.getElementById('sum1').textContent = value;
       }
       if (stage.type === 'delivery') {
         document.getElementById('dot2').classList.add('active');
         document.getElementById('circle2').textContent = '🚚';
         document.getElementById('text2').textContent = value;
-        document.getElementById('sum2').textContent = value;
       }
       if (stage.type === 'reward') {
         document.getElementById('dot3').classList.add('active');
@@ -638,7 +700,6 @@
         rewardImg.src = value.img;
         rewardImg.alt = value.name;
         document.getElementById('text3').textContent = value.name;
-        document.getElementById('sum3').textContent = value.name;
       }
     }
 
@@ -664,41 +725,44 @@
     }
 
     function spinStage() {
+      if (stageIndex >= stages.length) return;
+
       const stage = stages[stageIndex];
       const options = stage.options;
       const winnerIndex = Math.floor(Math.random() * options.length);
       const winner = options[winnerIndex];
 
-      const cards = Array.from(reelTrack.querySelectorAll('.reel-card'));
-      const baseIndex = options.length * 2 + winnerIndex;
-      const targetCard = cards[baseIndex];
-      if (!targetCard) return;
-
+      const cardWidth = 180 + 18;
       const viewportWidth = reelViewport.clientWidth;
-      const cardCenter = targetCard.offsetLeft + targetCard.offsetWidth / 2;
-      const targetX = viewportWidth / 2 - cardCenter;
+      const centerOffset = viewportWidth / 2 - 90;
+      const baseIndex = options.length * 2 + winnerIndex;
+      const targetX = -(baseIndex * cardWidth) + centerOffset + (Math.random() * 20 - 10);
 
       spinBtn.disabled = true;
+      spinBtn.textContent = 'Spinning...';
       statusChip.textContent = 'Spinning...';
       reelTrack.style.transform = `translate3d(${targetX}px, -50%, 0)`;
 
       setTimeout(() => {
         results[stage.type] = winner;
         updateDot(stage, winner);
-        stageIndex += 1;
+        stageIndex++;
 
         if (stageIndex < stages.length) {
           setStage(stageIndex);
           spinBtn.disabled = false;
           spinBtn.textContent = stageIndex === 1 ? 'Spin Again' : 'Reveal Final Reward';
+          statusChip.textContent = stages[stageIndex].chip;
+          stageLabel.textContent = stages[stageIndex].label;
         } else {
           statusChip.textContent = 'Completed';
           stageLabel.textContent = 'All three results are unlocked';
           spinBtn.textContent = 'Completed';
+          spinBtn.disabled = true;
           summary.style.display = 'block';
           startTimer(14, 59);
         }
-      }, 4900);
+      }, 5000);
     }
 
     function startTimer(minutes, seconds) {
@@ -729,8 +793,11 @@
       }, 1000);
     }
 
-    spinBtn.addEventListener('click', spinStage);
+    // Инициализация
     setStage(0);
+
+    // События
+    spinBtn.addEventListener('click', spinStage);
 
     window.addEventListener('load', () => {
       offerEntryOverlay.style.display = 'flex';
@@ -744,14 +811,11 @@
       offerOverlay.style.display = 'none';
     });
 
-    // Обработка формы
     document.getElementById('leadForm').addEventListener('submit', function(e) {
       e.preventDefault();
       alert('Спасибо! Ваши данные отправлены. Курьер свяжется с вами в ближайшее время 🎉');
-      // Здесь можно добавить реальную отправку (fetch на сервер, Telegram, WhatsApp и т.д.)
     });
 
-    // Кнопка Get my reward — показывает финальный оверлей
     document.querySelector('.btn-reward').addEventListener('click', showFinalOffer);
 
     window.addEventListener('resize', () => {

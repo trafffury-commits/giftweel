@@ -1,281 +1,154 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Крути колесо удачи</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #0f001a, #1a0033, #2a004d);
-      color: #f0e6ff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рулетка призов</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
 
-    h1 {
-      font-size: 3.2rem;
-      margin: 0.4em 0 0.8em;
-      background: linear-gradient(90deg, #ff6bcb, #a78bfa, #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(167,139,250,0.6);
-    }
+.container {
+  text-align: center;
+}
 
-    #wheel-container {
-      position: relative;
-      width: 360px;
-      height: 360px;
-      margin: 2rem 0;
-    }
+.roulette {
+  width: 320px;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 2px solid #1e293b;
+  margin: 20px auto;
+}
 
-    #wheel {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: #111;
-      box-shadow: 
-        0 0 50px rgba(200,100,255,0.6),
-        inset 0 0 40px rgba(0,0,0,0.8);
-      transition: transform 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
-      transform: rotate(0deg);
-      overflow: hidden;
-    }
+.track {
+  display: flex;
+  transition: transform 2s cubic-bezier(.25,.8,.25,1);
+}
 
-    .slice {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      transform-origin: 50% 50%;
-      clip-path: polygon(50% 50%, 100% 0%, 100% 100%);
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: white;
-      text-shadow: 0 1px 4px black, 1px 1px 3px black;
-    }
+.item {
+  min-width: 320px;
+  padding: 20px;
+  background: #1e293b;
+}
 
-    .slice-text {
-      transform: translateX(-40px) rotate(90deg);
-      white-space: nowrap;
-    }
+.item img {
+  width: 150px;
+  height: auto;
+}
 
-    .pointer {
-      position: absolute;
-      top: -45px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 24px solid transparent;
-      border-right: 24px solid transparent;
-      border-bottom: 48px solid #ffeb3b;
-      filter: drop-shadow(0 4px 12px #ffeb3b88);
-      z-index: 10;
-    }
+button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  background: #3b82f6;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    #spin-btn {
-      margin-top: 1rem;
-      padding: 1rem 3rem;
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: white;
-      background: linear-gradient(45deg, #ff3366, #cc33ff);
-      border: none;
-      border-radius: 999px;
-      box-shadow: 0 8px 30px rgba(204,51,255,0.55);
-      cursor: pointer;
-      transition: all 0.3s;
-    }
+button:disabled {
+  background: #475569;
+}
 
-    #spin-btn:hover:not(:disabled) {
-      transform: translateY(-4px);
-      box-shadow: 0 14px 40px rgba(204,51,255,0.75);
-    }
+.win-screen {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
 
-    #spin-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: red;
+  animation: fall 3s linear infinite;
+}
 
-    #result {
-      margin: 1.5rem 0;
-      font-size: 2.1rem;
-      font-weight: bold;
-      min-height: 3rem;
-      text-align: center;
-      text-shadow: 0 0 15px rgba(255,255,255,0.7);
-    }
-
-    #congrats {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(10,5,30,0.92);
-      backdrop-filter: blur(10px);
-      z-index: 100;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem;
-    }
-
-    #congrats h2 {
-      font-size: 4.5rem;
-      margin-bottom: 1.2rem;
-      background: linear-gradient(90deg, #00ffaa, #00d4ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    #claim-btn {
-      margin-top: 2.5rem;
-      padding: 1.3rem 4rem;
-      font-size: 1.9rem;
-      font-weight: bold;
-      color: white;
-      background: linear-gradient(45deg, #00c853, #76ff03);
-      border: none;
-      border-radius: 999px;
-      box-shadow: 0 12px 35px rgba(100,221,23,0.6);
-      cursor: pointer;
-      transition: all 0.35s;
-    }
-
-    #claim-btn:hover {
-      transform: scale(1.07);
-      box-shadow: 0 18px 50px rgba(100,221,23,0.8);
-    }
-
-    footer {
-      position: absolute;
-      bottom: 1.2rem;
-      opacity: 0.65;
-      font-size: 0.95rem;
-    }
-  </style>
+@keyframes fall {
+  0% {transform: translateY(-100px);} 
+  100% {transform: translateY(100vh);} 
+}
+</style>
 </head>
 <body>
 
-  <h1>Крути колесо удачи!</h1>
-
-  <div id="wheel-container">
-    <div class="pointer"></div>
-    <div id="wheel"></div>
+<div class="container">
+  <h1>Испытай удачу</h1>
+  <div class="roulette">
+    <div class="track" id="track">
+      <div class="item"><img src="https://via.placeholder.com/150"><p>iPhone 17 Pro</p></div>
+      <div class="item"><img src="https://via.placeholder.com/150"><p>iPhone 17 Pro Max</p></div>
+      <div class="item"><img src="https://via.placeholder.com/150"><p>MacBook Air</p></div>
+      <div class="item"><img src="https://via.placeholder.com/150"><p>MacBook Pro</p></div>
+      <div class="item"><img src="https://via.placeholder.com/150"><p>Dyson Фен</p></div>
+      <div class="item"><img src="https://via.placeholder.com/150"><p>Apple Watch 11</p></div>
+      <div class="item"><img src="https://via.placeholder.com/150"><p>Apple Watch Ultra</p></div>
+    </div>
   </div>
+  <button id="spinBtn">Крутить</button>
+</div>
 
-  <button id="spin-btn">Крутить</button>
+<div class="win-screen" id="winScreen">
+  <h1>Вы выиграли!</h1>
+  <button>Забрать приз!</button>
+</div>
 
-  <div id="result"></div>
+<script>
+let spins = 0;
+const track = document.getElementById('track');
+const btn = document.getElementById('spinBtn');
+const winScreen = document.getElementById('winScreen');
 
-  <div id="congrats">
-    <h2>Поздравляем!</h2>
-    <p style="font-size:1.7rem; max-width:640px; line-height:1.4;">
-      Ты выиграл <span id="final-prize" style="color:#00ffaa; font-weight:bold;">100 000 рупий</span>!
-    </p>
-    <button id="claim-btn">Забрать приз сейчас!</button>
-  </div>
+btn.addEventListener('click', () => {
+  spins++;
 
-  <footer>2026 © Traff</footer>
+  let position;
 
-  <script>
-    const prizes = [
-      "0 рупий",
-      "1 000 рупий",
-      "10 000 рупий",
-      "100 000 рупий",
-      "iPhone 17 PRO MAX",
-      "Подписка Netflix"
-    ];
+  if (spins < 3) {
+    position = Math.floor(Math.random() * 7);
+  } else {
+    position = 1; // гарантированный "выигрыш"
+  }
 
-    // Фиксированная последовательность (индексы призов)
-    const sequence = [0, 2, 3]; // 0 → 10к → 100к
+  track.style.transform = `translateX(-${position * 320}px)`;
 
-    let spinCount = 0;
-    let isSpinning = false;
+  if (spins === 3) {
+    setTimeout(() => {
+      showWin();
+    }, 2000);
+    btn.disabled = true;
+  }
+});
 
-    const wheel = document.getElementById("wheel");
-    const spinBtn = document.getElementById("spin-btn");
-    const resultEl = document.getElementById("result");
-    const congrats = document.getElementById("congrats");
-    const claimBtn = document.getElementById("claim-btn");
-    const finalPrizeEl = document.getElementById("final-prize");
+function showWin() {
+  winScreen.style.display = 'flex';
 
-    function createWheel() {
-      wheel.innerHTML = "";
-      const degPerSlice = 360 / prizes.length;
-
-      prizes.forEach((prize, i) => {
-        const slice = document.createElement("div");
-        slice.className = "slice";
-        slice.style.transform = `rotate(${i * degPerSlice}deg)`;
-        
-        // Цвета посветлее/потемнее для контраста
-        const hue = (i * 60) % 360;
-        slice.style.background = `hsl(${hue}, 85%, 55%)`;
-
-        const text = document.createElement("div");
-        text.className = "slice-text";
-        text.textContent = prize;
-        slice.appendChild(text);
-
-        wheel.appendChild(slice);
-      });
-    }
-
-    createWheel();
-
-    function getRandomOffset(max = 20) {
-      return Math.random() * max * 2 - max;
-    }
-
-    spinBtn.addEventListener("click", () => {
-      if (isSpinning || spinCount >= 3) return;
-      isSpinning = true;
-      spinBtn.disabled = true;
-
-      const winIndex = sequence[spinCount];
-      const spins = 5 + spinCount;           // больше оборотов с каждым разом
-      const baseDeg = 360 * spins;
-      const sliceDeg = 360 / prizes.length;
-      const centerOfSlice = winIndex * sliceDeg + sliceDeg / 2;
-      const randomOffset = getRandomOffset(18);
-      const finalDeg = baseDeg + (360 - centerOfSlice + randomOffset);
-
-      wheel.style.transform = `rotate(${finalDeg}deg)`;
-
-      setTimeout(() => {
-        const won = prizes[winIndex];
-        resultEl.textContent = `Выпало: ${won} 🎉`;
-
-        spinCount++;
-
-        if (spinCount >= 3) {
-          setTimeout(() => {
-            finalPrizeEl.textContent = "100 000 рупий";
-            congrats.style.display = "flex";
-          }, 1600);
-        } else {
-          spinBtn.disabled = false;
-        }
-
-        isSpinning = false;
-      }, 5200);
-    });
-
-    claimBtn.addEventListener("click", () => {
-      // ← Замени на свою ссылку
-      window.location.href = "https://t.me/твой_ник_или_бот";
-    });
-  </script>
+  for (let i = 0; i < 50; i++) {
+    const conf = document.createElement('div');
+    conf.classList.add('confetti');
+    conf.style.left = Math.random() * 100 + 'vw';
+    conf.style.background = `hsl(${Math.random()*360},100%,50%)`;
+    conf.style.animationDuration = (Math.random()*2+2) + 's';
+    document.body.appendChild(conf);
+  }
+}
+</script>
 
 </body>
 </html>

@@ -10,20 +10,25 @@ body {
   font-family: Arial, sans-serif;
   background: #0f172a;
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
   overflow: hidden;
 }
 
 .container {
   text-align: center;
-  padding-top: 40px;
+  width: 100%;
 }
 
 .roulette {
-  width: 100%;
+  width: 100vw;
   overflow: hidden;
   position: relative;
   border-top: 2px solid #1e293b;
   border-bottom: 2px solid #1e293b;
+  margin: 20px 0;
 }
 
 .track {
@@ -37,28 +42,33 @@ body {
 }
 
 .item img {
-  width: 120px;
+  width: 140px;
 }
 
-.center-line {
+.pointer {
   position: absolute;
-  top: 0;
+  top: -10px;
   left: 50%;
-  width: 2px;
-  height: 100%;
-  background: white;
   transform: translateX(-50%);
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 20px solid #fff;
 }
 
 button {
-  margin-top: 30px;
   padding: 14px 28px;
   border: none;
   border-radius: 12px;
   background: #3b82f6;
   color: white;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
+}
+
+.message {
+  margin-top: 15px;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .win-screen {
@@ -77,49 +87,49 @@ button {
 <div class="container">
   <h1>Испытай удачу</h1>
   <div class="roulette">
+    <div class="pointer"></div>
     <div class="track" id="track"></div>
-    <div class="center-line"></div>
   </div>
-  <button id="spinBtn">Крутить</button>
+  <button id="spinBtn">КРУТИТЬ</button>
+  <div class="message" id="message"></div>
 </div>
 
 <div class="win-screen" id="winScreen">
-  <h1>Вы выиграли!</h1>
-  <button>Забрать приз!</button>
+  <h1 id="winText"></h1>
+  <button>Забрать выигрыш</button>
 </div>
 
 <script>
 const prizes = [
-  'iPhone 17 Pro',
-  'iPhone 17 Pro Max',
-  'MacBook Air',
-  'MacBook Pro',
-  'Dyson Фен',
-  'Apple Watch 11',
-  'Apple Watch Ultra'
+  {name:'iPhone 17 Pro', img:'https://via.placeholder.com/140?text=iPhone'},
+  {name:'iPhone 17 Pro Max', img:'https://via.placeholder.com/140?text=ProMax'},
+  {name:'MacBook Air', img:'https://via.placeholder.com/140?text=Air'},
+  {name:'MacBook Pro', img:'https://via.placeholder.com/140?text=Pro'},
+  {name:'Dyson Фен', img:'https://via.placeholder.com/140?text=Dyson'},
+  {name:'Apple Watch 11', img:'https://via.placeholder.com/140?text=Watch'},
+  {name:'Apple Watch Ultra', img:'https://via.placeholder.com/140?text=Ultra'}
 ];
 
 const track = document.getElementById('track');
 const btn = document.getElementById('spinBtn');
+const message = document.getElementById('message');
 const winScreen = document.getElementById('winScreen');
+const winText = document.getElementById('winText');
 
-// создаём длинную ленту
 let items = [];
-for (let i = 0; i < 30; i++) {
+for (let i = 0; i < 50; i++) {
   const prize = prizes[i % prizes.length];
   const div = document.createElement('div');
   div.className = 'item';
-  div.innerHTML = `<img src="https://via.placeholder.com/120"><p>${prize}</p>`;
+  div.innerHTML = `<img src="${prize.img}"><p>${prize.name}</p>`;
   track.appendChild(div);
-  items.push(div);
+  items.push(prize);
 }
 
 let spins = 0;
 let currentX = 0;
 
 btn.addEventListener('click', () => {
-  if (btn.disabled) return;
-
   spins++;
 
   const itemWidth = 220;
@@ -127,31 +137,44 @@ btn.addEventListener('click', () => {
 
   let targetIndex;
 
-  if (spins < 3) {
-    targetIndex = Math.floor(Math.random() * items.length);
+  if (spins === 1) {
+    targetIndex = 5;
+  } else if (spins === 2) {
+    targetIndex = 12;
   } else {
-    targetIndex = 10; // фиксированный выигрыш
+    targetIndex = 20;
   }
 
   const targetX = -(targetIndex * itemWidth - center + itemWidth / 2);
 
-  animateSpin(currentX, targetX, 4000 + spins * 1000);
+  animateSpin(currentX, targetX, 5000 + spins * 1000);
 
   currentX = targetX;
 
-  if (spins === 3) {
-    setTimeout(() => {
+  setTimeout(() => {
+    if (spins === 1) {
+      message.textContent = 'БЕЗ ВЫИГРЫША =((( У ТЕБЯ ЕСТЬ ЕЩЕ 2 ПОПЫТКИ. КРУТИТЬ!';
+    }
+
+    if (spins === 2) {
+      message.textContent = 'ЕСТЬ ВЫИГРЫШ!';
+      launchFireworks();
+    }
+
+    if (spins === 3) {
+      const prize = items[targetIndex].name;
+      winText.textContent = 'Ты выиграл: ' + prize;
       winScreen.style.display = 'flex';
       btn.disabled = true;
-    }, 6000);
-  }
+    }
+  }, 6000);
 });
 
 function animateSpin(start, end, duration) {
   const startTime = performance.now();
 
   function easeOut(t) {
-    return 1 - Math.pow(1 - t, 4);
+    return 1 - Math.pow(1 - t, 5);
   }
 
   function frame(time) {
@@ -161,12 +184,26 @@ function animateSpin(start, end, duration) {
     const value = start + (end - start) * eased;
     track.style.transform = `translateX(${value}px)`;
 
-    if (progress < 1) {
-      requestAnimationFrame(frame);
-    }
+    if (progress < 1) requestAnimationFrame(frame);
   }
 
   requestAnimationFrame(frame);
+}
+
+function launchFireworks() {
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.style.position = 'fixed';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.top = Math.random() * 100 + 'vh';
+    el.style.width = '6px';
+    el.style.height = '6px';
+    el.style.background = `hsl(${Math.random()*360},100%,50%)`;
+    el.style.borderRadius = '50%';
+    el.style.animation = 'fall 2s linear';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2000);
+  }
 }
 </script>
 

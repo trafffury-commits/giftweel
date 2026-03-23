@@ -1,211 +1,109 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Рулетка призов</title>
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: white;
+/* Форма */
+.lead-form {
+  margin: 28px 0 12px;
+  padding: 24px;
+  background: rgba(255,255,255,0.82);
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(15,23,42,0.08);
+}
+
+.form-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  overflow: hidden;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
-.container {
-  text-align: center;
-  width: 100%;
-}
-
-.roulette {
-  width: 100vw;
-  overflow: hidden;
-  position: relative;
-  border-top: 2px solid #1e293b;
-  border-bottom: 2px solid #1e293b;
-  margin: 20px 0;
-}
-
-.track {
-  display: flex;
-}
-
-.item {
+.form-group {
+  flex: 1;
   min-width: 220px;
-  padding: 20px;
+}
+
+.form-group.half {
+  flex: 0.5;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.required {
+  color: var(--red);
+}
+
+input, select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(15,23,42,0.12);
+  border-radius: 14px;
+  font-size: 16px;
+  background: white;
+  transition: all 0.2s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(29,78,216,0.12);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 24px;
+  justify-content: center;
+}
+
+/* Увеличенные и выделенные кнопки */
+.btn-unlock,
+.btn-reward {
+  min-width: 260px;
+  padding: 20px 32px;
+  font-size: 18px;
+  font-weight: 900;
+  border-radius: 22px;
+  box-shadow: 0 16px 48px rgba(29,78,216,0.28);
+  transition: all 0.22s ease;
+}
+
+.btn-unlock {
+  background: linear-gradient(135deg, #1d4ed8, #7c3aed, #ec4899);
+  color: white;
+  border: none;
+}
+
+.btn-unlock:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 24px 64px rgba(29,78,216,0.4);
+}
+
+.btn-reward {
+  background: linear-gradient(135deg, #f59e0b, #ea580c, #dc2626);
+  color: white;
+  border: none;
+}
+
+.btn-reward:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 24px 64px rgba(245,158,11,0.4);
+}
+
+/* Мелкие улучшения */
+.summary h3 {
+  font-size: 32px;
+  margin-bottom: 12px;
   text-align: center;
 }
 
-.item img {
-  width: 140px;
+.summary p {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 24px;
 }
-
-.pointer {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 20px solid #fff;
-}
-
-button {
-  padding: 14px 28px;
-  border: none;
-  border-radius: 12px;
-  background: #3b82f6;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.message {
-  margin-top: 15px;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.win-screen {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-  <h1>Испытай удачу</h1>
-  <div class="roulette">
-    <div class="pointer"></div>
-    <div class="track" id="track"></div>
-  </div>
-  <button id="spinBtn">КРУТИТЬ</button>
-  <div class="message" id="message"></div>
-</div>
-
-<div class="win-screen" id="winScreen">
-  <h1 id="winText"></h1>
-  <button>Забрать выигрыш</button>
-</div>
-
-<script>
-const prizes = [
-  {name:'iPhone 17 Pro', img:'https://via.placeholder.com/140?text=iPhone'},
-  {name:'iPhone 17 Pro Max', img:'https://via.placeholder.com/140?text=ProMax'},
-  {name:'MacBook Air', img:'https://via.placeholder.com/140?text=Air'},
-  {name:'MacBook Pro', img:'https://via.placeholder.com/140?text=Pro'},
-  {name:'Dyson Фен', img:'https://via.placeholder.com/140?text=Dyson'},
-  {name:'Apple Watch 11', img:'https://via.placeholder.com/140?text=Watch'},
-  {name:'Apple Watch Ultra', img:'https://via.placeholder.com/140?text=Ultra'}
-];
-
-const track = document.getElementById('track');
-const btn = document.getElementById('spinBtn');
-const message = document.getElementById('message');
-const winScreen = document.getElementById('winScreen');
-const winText = document.getElementById('winText');
-
-let items = [];
-for (let i = 0; i < 50; i++) {
-  const prize = prizes[i % prizes.length];
-  const div = document.createElement('div');
-  div.className = 'item';
-  div.innerHTML = `<img src="${prize.img}"><p>${prize.name}</p>`;
-  track.appendChild(div);
-  items.push(prize);
-}
-
-let spins = 0;
-let currentX = 0;
-
-btn.addEventListener('click', () => {
-  spins++;
-
-  const itemWidth = 220;
-  const center = window.innerWidth / 2;
-
-  let targetIndex;
-
-  if (spins === 1) {
-    targetIndex = 5;
-  } else if (spins === 2) {
-    targetIndex = 12;
-  } else {
-    targetIndex = 20;
-  }
-
-  const targetX = -(targetIndex * itemWidth - center + itemWidth / 2);
-
-  animateSpin(currentX, targetX, 5000 + spins * 1000);
-
-  currentX = targetX;
-
-  setTimeout(() => {
-    if (spins === 1) {
-      message.textContent = 'БЕЗ ВЫИГРЫША =((( У ТЕБЯ ЕСТЬ ЕЩЕ 2 ПОПЫТКИ. КРУТИТЬ!';
-    }
-
-    if (spins === 2) {
-      message.textContent = 'ЕСТЬ ВЫИГРЫШ!';
-      launchFireworks();
-    }
-
-    if (spins === 3) {
-      const prize = items[targetIndex].name;
-      winText.textContent = 'Ты выиграл: ' + prize;
-      winScreen.style.display = 'flex';
-      btn.disabled = true;
-    }
-  }, 6000);
-});
-
-function animateSpin(start, end, duration) {
-  const startTime = performance.now();
-
-  function easeOut(t) {
-    return 1 - Math.pow(1 - t, 5);
-  }
-
-  function frame(time) {
-    const progress = (time - startTime) / duration;
-    const eased = easeOut(Math.min(progress, 1));
-
-    const value = start + (end - start) * eased;
-    track.style.transform = `translateX(${value}px)`;
-
-    if (progress < 1) requestAnimationFrame(frame);
-  }
-
-  requestAnimationFrame(frame);
-}
-
-function launchFireworks() {
-  for (let i = 0; i < 30; i++) {
-    const el = document.createElement('div');
-    el.style.position = 'fixed';
-    el.style.left = Math.random() * 100 + 'vw';
-    el.style.top = Math.random() * 100 + 'vh';
-    el.style.width = '6px';
-    el.style.height = '6px';
-    el.style.background = `hsl(${Math.random()*360},100%,50%)`;
-    el.style.borderRadius = '50%';
-    el.style.animation = 'fall 2s linear';
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(),2000);
-  }
-}
-</script>
-
-</body>
-</html>
